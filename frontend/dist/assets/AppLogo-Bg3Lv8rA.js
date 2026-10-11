@@ -1,1 +1,0 @@
-import{j as o,L as r}from"./index-Bu-vGR1O.js";import{l}from"./logo-dIh2flbK.js";const t="/assets/logo-6SD6VZEC.png",e=({height:s})=>o.jsxs(o.Fragment,{children:[o.jsx(r,{to:"/",className:"logo-dark",children:o.jsx("img",{src:t,alt:"dark logo",height:s??28})}),o.jsx(r,{to:"/",className:"logo-light",children:o.jsx("img",{src:l,alt:"logo",height:s??28})})]});export{e as A};
