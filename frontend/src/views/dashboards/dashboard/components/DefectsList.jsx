@@ -1,6 +1,9 @@
 import { useEffect, useState } from "react";
 import { Container, Table, Card, Badge, Form, InputGroup } from "react-bootstrap"; // Added Form and InputGroup
 import axios from "axios";
+import jsPDF from "jspdf";
+import autoTable from "jspdf-autotable";
+import { FiDownload } from "react-icons/fi";
 import PageBreadcrumb from "@/components/PageBreadcrumb";
 
 const DefectsList = () => {
@@ -44,6 +47,32 @@ const DefectsList = () => {
         return defectType.includes(searchQuery.toLowerCase());
     });
 
+    const downloadPDF = () => {
+        const doc = new jsPDF();
+        const tableRows = filteredDefects.map((defect) => [
+            defect.camera_id || "N/A",
+            (defect.crack_type || defect.defect_type || "Unknown").replace(/_/g, " "),
+            defect.confidence ? `${(defect.confidence * 100).toFixed(1)}%` : "N/A",
+            defect.severity ? defect.severity.toUpperCase() : "N/A",
+            defect.timestamp || defect.detected_time || "N/A",
+        ]);
+
+        doc.setFontSize(16);
+        doc.text("Defect Details", 14, 16);
+        doc.setFontSize(10);
+        doc.text(`Generated: ${new Date().toLocaleString()}`, 14, 23);
+
+        autoTable(doc, {
+            head: [["Camera ID", "Defect Type", "Confidence", "Severity", "Detected Time"]],
+            body: tableRows,
+            startY: 29,
+            styles: { fontSize: 8 },
+            headStyles: { fillColor: [52, 58, 64] },
+        });
+
+        doc.save(`defect-details-${new Date().toISOString().slice(0, 10)}.pdf`);
+    };
+
     return (
         <Container fluid>
             <PageBreadcrumb title="Defect Details" />
@@ -51,7 +80,16 @@ const DefectsList = () => {
             <Card className="mt-4 shadow-sm">
                 <Card.Body>
                     {/* Search Bar */}
-                    <div className="mb-3 d-flex justify-content-end">
+                    <div className="mb-3 d-flex justify-content-between align-items-center gap-2 flex-wrap">
+                        <button
+                            type="button"
+                            className="btn btn-primary d-inline-flex align-items-center gap-2"
+                            onClick={downloadPDF}
+                            disabled={filteredDefects.length === 0}
+                        >
+                            <FiDownload aria-hidden="true" />
+                            Download PDF
+                        </button>
                         <div style={{ maxWidth: "300px", width: "100%" }}>
                             <Form.Control
                                 type="text"
