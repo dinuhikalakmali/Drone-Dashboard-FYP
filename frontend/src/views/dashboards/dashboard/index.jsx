@@ -86,7 +86,7 @@ const Index = () => {
   const pipelineStages = [
     { label: "Drone Capture", icon: BsCameraVideo },
     { label: "Image Pre-processing", icon: BsCpu },
-    { label: "YOLOv11 Defect Detection", icon: BsBoundingBox },
+    { label: "YOLOv8 Defect Detection", icon: BsBoundingBox },
     { label: "Defect Classification", icon: BsWrenchAdjustable },
     { label: "Dashboard & Report", icon: BsFileEarmarkBarGraph },
   ];
@@ -99,7 +99,7 @@ const Index = () => {
     },
     {
       title: "Real-Time Defect Detection",
-      desc: "YOLOv11-based computer vision pipeline for cracks and surface defects.",
+      desc: "YOLOv8-based computer vision pipeline for cracks and surface defects.",
     },
     {
       title: "Centralized Web Dashboard",
@@ -113,16 +113,16 @@ const Index = () => {
 
   // Headline evaluation results (Chapter 6 test results)
   const performanceMetrics = [
-    { label: "Overall Defect Detection Accuracy", value: 92.3, variant: "success" },
-    { label: "Bright Daylight Accuracy", value: 95.2, variant: "success" },
-    { label: "Overcast / Low-Light Accuracy", value: 83.4, variant: "warning" },
+    // { label: "Overall Defect Detection Accuracy", value: 92.3, variant: "success" },
+    // { label: "Bright Daylight Accuracy", value: 95.2, variant: "success" },
+    // { label: "Overcast / Low-Light Accuracy", value: 83.4, variant: "warning" },
     { label: "Unit Test Pass Rate", value: 100, variant: "info" },
     { label: "Integration Test Pass Rate", value: 100, variant: "info" },
   ];
 
   const techStack = [
     "React", "React-Bootstrap", "Axios", "MongoDB",
-    "YOLOv11", "OpenCV", "Streamlit", "Node.js / Express",
+    "YOLOv8", "OpenCV", "Streamlit", "Node.js / Express",
   ];
 
   return (
@@ -138,23 +138,13 @@ const Index = () => {
             </Card.Header>
             <Card.Body>
               <p>
-                Construction quality checks are still mostly done by hand — engineers
-                physically climb scaffolding and walk through unfinished buildings to
-                look for cracks, spalling, and other structural defects. It's slow,
-                depends heavily on the individual inspector's experience, and puts
-                people at risk of falls, one of the leading causes of injury on
-                construction sites. Defects that go unnoticed often only surface after
-                handover, when fixing them is far more expensive and disruptive.
+                Construction quality inspections are mostly done manually, with engineers climbing scaffolding and walking through unfinished buildings to find cracks, spalling, and other defects. This process takes time, depends on the inspector’s experience, and can be dangerous. If defects are missed, they may be discovered after handover, making repairs more costly.
+
+
               </p>
               <p className="mb-4">
-                This project explores whether that process can be automated. A drone
-                fitted with a camera flies a set inspection path over a construction
-                site, capturing footage as it goes. A YOLOv11-based computer vision
-                model analyzes that footage in real time to detect cracks and other
-                surface defects, and every detection — with its location, confidence
-                score, and severity — is logged and pushed to this web dashboard,
-                where Engineers, QA Officers, and Administrators can review it and
-                generate inspection reports.
+                This project aims to make inspections easier and safer using a drone with a camera. The drone follows a planned path and captures footage, which is analyzed in real time by a YOLOv8-based computer vision model to detect defects. Each detection, including its location, confidence score, and severity, is sent to a web dashboard where Engineers, QA Officers, and Administrators can review defects and generate inspection reports.
+
               </p>
 
               <Row className="g-4">
@@ -192,11 +182,10 @@ const Index = () => {
         </Col>
       </Row>
 
-      {/* Top row — 6 stat cards, unchanged layout */}
       <Row>
         <Col xs={12} className="mb-4">
-          <Row lg={3} md={2} sm={1} className="g-4">
-            <Col>
+  <Row className="g-4">
+    <Col xs={12} md={6}>
               <Link to="/defects-list" style={{ textDecoration: "none" }}>
                 <StatCard
                   item={{
@@ -208,7 +197,7 @@ const Index = () => {
                 />
               </Link>
             </Col>
-            <Col>
+            {/* <Col>
               <StatCard
                 item={{
                   title: "Active Inspection Count",
@@ -217,7 +206,7 @@ const Index = () => {
                   value: activeAssets,
                 }}
               />
-            </Col>
+            </Col> */}
             <Col>
               <Link to="https://drone-navigation-system-gvyv3qizhq44bzhzkt8w6m.streamlit.app/">
                 <StatCard
@@ -230,7 +219,7 @@ const Index = () => {
                 />
               </Link>
             </Col>
-            <Col>
+            {/* <Col>
               <StatCard
                 item={{
                   title: "Defect Report Download",
@@ -239,8 +228,8 @@ const Index = () => {
                   value: 0,
                 }}
               />
-            </Col>
-            <Col>
+            </Col> */}
+            {/* <Col>
               <StatCard
                 item={{
                   title: "Recent Activity Feed",
@@ -249,8 +238,8 @@ const Index = () => {
                   value: 0,
                 }}
               />
-            </Col>
-            <Col>
+            </Col> */}
+            {/* <Col>
               <StatCard
                 item={{
                   title: "Critical Alerts Notifications",
@@ -259,7 +248,7 @@ const Index = () => {
                   value: 0,
                 }}
               />
-            </Col>
+            </Col> */}
           </Row>
         </Col>
       </Row>
