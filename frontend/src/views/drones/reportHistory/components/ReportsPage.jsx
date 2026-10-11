@@ -3,46 +3,6 @@ import jsPDF from "jspdf";
 import autoTable from "jspdf-autotable";
 import { useState } from "react";
 
-const getImageLookup = (defect) => {
-  if (!defect) return null;
-
-  // Only use database-backed GridFS IDs. Legacy filename/path values are not
-  // guaranteed to exist in MongoDB and will otherwise trigger broken image requests.
-  const imageId = defect.image_id;
-  if (imageId && /^[a-fA-F0-9]{24}$/.test(String(imageId))) {
-    return String(imageId);
-  }
-
-  return null;
-};
-
-const getImageDataUrl = async (defect) => {
-  const lookup = getImageLookup(defect);
-  if (!lookup) return null;
-
-  try {
-    const response = await fetch(`http://localhost:5000/api/defects/image/${encodeURIComponent(lookup)}`);
-    if (!response.ok) {
-      if (response.status !== 404) {
-        console.error("Report image load failed:", response.status, response.statusText);
-      }
-      return null;
-    }
-
-    const blob = await response.blob();
-
-    return await new Promise((resolve, reject) => {
-      const reader = new FileReader();
-      reader.onloadend = () => resolve(reader.result);
-      reader.onerror = () => reject(new Error("Failed to read image blob"));
-      reader.readAsDataURL(blob);
-    });
-  } catch (error) {
-    console.error("Error loading defect image from database:", error);
-    return null;
-  }
-};
-
 const DefectSummaryPDF = () => {
 
   const [error, setError] = useState("");
@@ -88,15 +48,6 @@ const DefectSummaryPDF = () => {
           setLoading(false);
           return;
         }
-
-        const enrichedDefects = [];
-        for (const defect of defects) {
-          enrichedDefects.push({
-            ...defect,
-            imageDataUrl: await getImageDataUrl(defect),
-          });
-        }
-        defects = enrichedDefects;
 
         const doc = new jsPDF({
           orientation: "portrait",
@@ -276,31 +227,6 @@ const DefectSummaryPDF = () => {
             const descriptionText = doc.splitTextToSize(defect.description, 180);
             doc.text(descriptionText, 14, yPosition);
             yPosition += (descriptionText.length * 5) + 5;
-          }
-
-          // Image section - resolve only through a database-backed GridFS ID
-          doc.setFont(undefined, "bold");
-          doc.setFontSize(11);
-          doc.setTextColor(40, 40, 40);
-          doc.text("Defect Image", 14, yPosition);
-          yPosition += 8;
-
-          if (defect.imageDataUrl) {
-            try {
-              doc.addImage(defect.imageDataUrl, "JPEG", 14, yPosition, 180, 100);
-              yPosition += 105;
-            } catch (imgError) {
-              doc.setFontSize(10);
-              doc.setTextColor(200, 50, 50);
-              doc.text("[Image could not be displayed]", 14, yPosition);
-              yPosition += 7;
-            }
-          } else {
-            doc.setFont(undefined, "normal");
-            doc.setFontSize(10);
-            doc.setTextColor(120, 120, 120);
-            doc.text("[No matching image found in the database]", 14, yPosition);
-            yPosition += 7;
           }
 
           // Add footer with page number
