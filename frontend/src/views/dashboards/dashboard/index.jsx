@@ -122,7 +122,7 @@ const Index = () => {
 
   const techStack = [
     "React", "React-Bootstrap", "Axios", "MongoDB",
-    "YOLOv8", "OpenCV", "Streamlit", "Node.js / Express",
+    "YOLOv8", "OpenCV", "Streamlit", "Codeigniter4/ Express",
   ];
 
   return (
