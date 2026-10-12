@@ -1,6 +1,8 @@
 import nodemailer from 'nodemailer';
+import Defect from '../models/defectsModel.js';
 
 let transporter;
+const ALERT_COOLDOWN_MS = 5 * 60 * 1000;
 
 // Initialize email transporter
 const initializeTransporter = () => {
@@ -22,11 +24,37 @@ const initializeTransporter = () => {
  * @param {Array} recipients - Array of user objects with email property
  */
 export const sendHighSeverityAlert = async (defect, recipients) => {
+  let alertClaimedAt;
+  let alertClaimed = false;
+
   try {
     if (!recipients || recipients.length === 0) {
       console.warn('⚠️ No recipients found for defect alert');
-      return;
+      return { sent: false, reason: 'no_recipients' };
     }
+
+    if (!defect?._id) {
+      throw new Error('A persisted defect is required to throttle email alerts');
+    }
+
+    alertClaimedAt = new Date();
+    const previousAlert = await Defect.findOneAndUpdate(
+      {
+        _id: defect._id,
+        $or: [
+          { emailAlertSentAt: { $exists: false } },
+          { emailAlertSentAt: { $lte: new Date(alertClaimedAt.getTime() - ALERT_COOLDOWN_MS) } },
+        ],
+      },
+      { $set: { emailAlertSentAt: alertClaimedAt } },
+      { new: false }
+    );
+
+    if (!previousAlert) {
+      console.info(`⏳ Suppressing duplicate email alert for defect ${defect._id}; cooldown is 5 minutes`);
+      return { sent: false, reason: 'throttled' };
+    }
+    alertClaimed = true;
 
     const emailTransporter = initializeTransporter();
     const emailList = recipients.map(user => user.email).join(',');
@@ -155,8 +183,18 @@ export const sendHighSeverityAlert = async (defect, recipients) => {
 
     const info = await emailTransporter.sendMail(mailOptions);
     console.log(`✅ Email alert sent successfully. Recipients: ${emailList}, Message ID: ${info.messageId}`);
-    return info;
+    return { sent: true, info };
   } catch (error) {
+    if (alertClaimed && defect?._id) {
+      try {
+        await Defect.updateOne(
+          { _id: defect._id, emailAlertSentAt: alertClaimedAt },
+          { $unset: { emailAlertSentAt: 1 } }
+        );
+      } catch (releaseError) {
+        console.error('❌ Failed to release defect email alert cooldown:', releaseError.message);
+      }
+    }
     console.error('❌ Error sending high severity alert email:', error.message);
     throw error;
   }

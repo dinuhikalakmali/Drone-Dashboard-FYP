@@ -79,7 +79,9 @@ const defectSchema = new mongoose.Schema({
     notificationSent: {
         type: Boolean,
         default: false
-    }
+    },
+
+    emailAlertSentAt: Date
 }, {
     timestamps: true,
     collection: 'detections'
