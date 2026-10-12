@@ -4,6 +4,7 @@ import dotenv from 'dotenv';
 import connectDB from './config/db.js';
 import authRouter from './routers/authRouter.js';
 import defectRouter from './routers/detectionRouter.js';
+import inspectionRouter from './routers/inspectionRouter.js';
 import { initializeDefectMonitoring } from './services/defectWatcher.js';
 import { testEmailConnection } from './services/emailService.js';
 
@@ -16,6 +17,7 @@ app.use(express.json({ limit: '10mb' }));
 
 app.use('/api/auth', authRouter);
 app.use('/api/defects', defectRouter);
+app.use('/api/inspections', inspectionRouter);
 
 app.get('/', (req, res) => {
   res.json({ message: 'Drone Navigation Dashboard API is running' });

@@ -42,7 +42,7 @@ If using Gmail as email service:
 1. Go to [Google Account Security](https://myaccount.google.com/security)
 2. Enable 2-Factor Authentication
 3. Generate an "App Password" (not your regular Gmail password)
-4. Use that app password in `EMAIL_PASSWORD`
+4. Use that app password in `EMAIL_RD`
 
 **Why?** Gmail blocks regular password authentication for security reasons. App passwords are safer.
 
