@@ -2,6 +2,7 @@ import express from 'express';
 import mongoose from 'mongoose';
 import { GridFSBucket, ObjectId } from 'mongodb';
 import Defect from '../models/Detection.js';
+import { authenticateDrone } from '../middleware/authenticateDrone.js';
 
 const router = express.Router();
 
@@ -190,7 +191,7 @@ router.get('/', async (req, res) => {
     }
 });
 
-router.post('/', async (req, res) => {
+const createDetection = async (req, res) => {
     try {
         const defect = await Defect.create(req.body);
         res.status(201).json({
@@ -206,6 +207,9 @@ router.post('/', async (req, res) => {
             error: error.message,
         });
     }
-});
+};
+
+router.post('/drone', authenticateDrone, createDetection);
+router.post('/', createDetection);
 
 export default router;

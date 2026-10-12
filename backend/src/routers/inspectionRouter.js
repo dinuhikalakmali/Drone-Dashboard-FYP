@@ -1,10 +1,11 @@
 import express from 'express';
 import Inspection from '../models/Inspection.js';
+import { authenticateDrone } from '../middleware/authenticateDrone.js';
 import { validateInspection } from '../middleware/validateInspection.js';
 
 const router = express.Router();
 
-router.post('/', validateInspection, async (req, res) => {
+router.post('/', authenticateDrone, validateInspection, async (req, res) => {
   try {
     const inspection = await Inspection.create({
       drone_id: req.body.drone_id.trim(),

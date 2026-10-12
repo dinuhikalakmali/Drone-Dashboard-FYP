@@ -58,6 +58,33 @@ Watch for:
 ✅ Defect watcher started successfully - listening for high severity defects
 ```
 
+## Drone API Authentication
+
+Drone submissions to `POST /api/inspections` and `POST /api/defects/drone` require an ID and a private token. The configured ID must match `drone_id` or `camera_id` in the request body.
+
+Generate a unique token in PowerShell:
+
+```powershell
+node -e "console.log(require('node:crypto').randomBytes(32).toString('hex'))"
+```
+
+Add the ID and generated token to `backend/.env` as a JSON object. Replace the example token; never commit or share the real value:
+
+```env
+DRONE_CREDENTIALS={"DRONE001":"replace-with-the-64-character-token"}
+```
+
+Multiple drones can be configured as additional entries in the JSON object. Restart the backend after changing `.env`.
+
+Send these headers with each drone request:
+
+```text
+x-drone-id: DRONE001
+x-drone-token: <the configured token>
+```
+
+The body must include the same ID as `camera_id` (defects) or `drone_id` (inspections). Do not embed the token in browser/frontend code; it belongs on the drone client. Keep `POST /api/defects` for existing dashboard submissions.
+
 ---
 
 ## Testing
